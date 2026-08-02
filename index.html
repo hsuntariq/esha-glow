@@ -335,42 +335,17 @@ img[data-broken="1"]{ display:none; }
 .orb-a{ width:9px; height:9px; background:var(--gold); top:24%; right:16%; box-shadow:0 0 22px 5px rgba(212,175,55,.55); }
 .orb-b{ width:5px; height:5px; background:var(--blush); top:66%; right:29%; box-shadow:0 0 18px 4px rgba(232,195,164,.5); }
 .orb-c{ width:7px; height:7px; background:var(--rose); top:38%; left:8%; box-shadow:0 0 20px 5px rgba(183,110,121,.5); }
-/* Hero image stack — the visual thesis: bridal work first, makeup second,
-   so the page says what the salon does before a word is read. */
-.hero-stack{
-  position:absolute; z-index:4; right:5%; top:50%; translate:0 -50%;
-  width:min(420px,32vw); aspect-ratio:3/4;
-}
+/* Concentric gold rings — the hero's only ornament. */
 .hero-ring{
-  position:absolute; left:-14%; top:50%; translate:0 -50%;
-  width:120%; aspect-ratio:1; border:1px solid rgba(212,175,55,.32); border-radius:50%;
+  position:absolute; z-index:3; right:7%; top:50%; translate:0 -50%;
+  width:min(460px,38vw); aspect-ratio:1;
+  border:1px solid rgba(212,175,55,.42); border-radius:50%;
+}
+.hero-ring::before{
+  content:""; position:absolute; inset:11%; border:1px solid rgba(232,195,164,.22); border-radius:50%;
 }
 .hero-ring::after{
-  content:""; position:absolute; inset:30px; border:1px solid rgba(232,195,164,.14); border-radius:50%;
-}
-.hero-card-a{
-  position:absolute; left:0; top:0; width:78%; height:88%;
-  border:1px solid rgba(212,175,55,.4); box-shadow:0 44px 90px -40px rgba(0,0,0,.85);
-}
-.hero-card-b{
-  position:absolute; right:0; bottom:0; width:52%; aspect-ratio:3/4;
-  border:1px solid rgba(255,249,245,.28); box-shadow:0 34px 70px -34px rgba(0,0,0,.85);
-}
-.hero-chip{
-  position:absolute; left:0; right:0; bottom:0; z-index:3; padding:26px 20px 20px;
-  background:linear-gradient(to top,rgba(15,12,11,.78),transparent);
-  color:#FFF9F5; font-family:'Poppins',sans-serif; font-size:.6rem;
-  letter-spacing:.28em; text-transform:uppercase; text-align:center; line-height:1.4;
-}
-.hero-note{
-  position:absolute; left:-14%; bottom:16%; z-index:5;
-  display:flex; align-items:center; gap:12px; padding:12px 18px; border-radius:14px;
-  background:rgba(255,249,245,.92); backdrop-filter:blur(10px); box-shadow:var(--shadow-lg);
-}
-.hero-note b{ font-family:'Playfair Display',serif; font-size:1.7rem; color:#1F1F1F; font-weight:500; line-height:1; }
-.hero-note span{
-  font-family:'Poppins',sans-serif; font-size:.56rem; letter-spacing:.2em;
-  text-transform:uppercase; color:#555; line-height:1.5;
+  content:""; position:absolute; inset:24%; border:1px solid rgba(212,175,55,.30); border-radius:50%;
 }
 .scroll-cue{ position:absolute; bottom:30px; left:50%; translate:-50% 0; z-index:5; color:rgba(255,249,245,.55); text-align:center; }
 .scroll-cue i{ display:block; margin-top:8px; animation:bob 1.9s infinite; }
@@ -565,11 +540,11 @@ html.no-motion .reveal{ opacity:1; transform:none; }
    RESPONSIVE — tablet down to 320px
    ============================================================ */
 @media (max-width:1279px){
-  .hero-stack{ width:min(340px,30vw); right:4%; }
+  .hero-ring{ width:min(360px,34vw); right:5%; }
 }
 @media (max-width:1023px){
   html{ scroll-padding-top:76px; }
-  .hero-stack{ display:none; }
+  .hero-ring{ width:min(300px,44vw); right:-8%; opacity:.75; }
   .hero-veil{ background:linear-gradient(120deg,rgba(20,16,14,.90) 0%,rgba(20,16,14,.72) 55%,rgba(20,16,14,.52) 100%); }
   .wrap{ width:min(1240px,90vw); }
   .section{ padding-block:clamp(64px,9vw,96px); }
@@ -598,6 +573,7 @@ html.no-motion .reveal{ opacity:1; transform:none; }
   .hero-sub{ font-size:.94rem; }
   .scroll-cue{ display:none; }
   .orb{ display:none; }
+  .hero-ring{ width:74vw; right:-22%; top:auto; bottom:6%; translate:0 0; opacity:.55; }
 
   .btn{ padding:.85rem 1.5rem; font-size:.66rem; letter-spacing:.18em; }
   .marquee{ padding:12px 0; }
@@ -779,24 +755,11 @@ html.no-motion .reveal{ opacity:1; transform:none; }
 <!-- ============ HERO ============ -->
 <section id="home" aria-label="Welcome">
   <div class="hero-bg" data-parallax="0.22">
-    <div class="art-slot" data-art="hero" data-photo="beautysalon" data-alt="The ESHA Glow studio floor"></div>
+    <div class="art-slot" data-art="hero"></div>
   </div>
   <div class="hero-veil"></div>
   <div class="hero-grain"></div>
-  <div class="hero-stack" data-parallax="-0.07">
-    <span class="hero-ring" aria-hidden="true"></span>
-    <figure class="frame arch hero-card-a">
-      <div class="art-slot" data-art="veil|bridal|Bridal" data-photo="bridalmakeup" data-ratio="600x800"></div>
-      <figcaption class="hero-chip">Bridal artistry</figcaption>
-    </figure>
-    <figure class="frame arch-sm hero-card-b">
-      <div class="art-slot" data-art="lipstick|makeup|Makeup" data-photo="makeupartist" data-ratio="500x640"></div>
-    </figure>
-    <div class="hero-note">
-      <b>4.9</b>
-      <span>rated by<br />1,280 guests</span>
-    </div>
-  </div>
+  <div class="hero-ring" data-parallax="-0.06" aria-hidden="true"></div>
   <span class="orb orb-a" data-float="26" aria-hidden="true"></span>
   <span class="orb orb-b" data-float="-34" aria-hidden="true"></span>
   <span class="orb orb-c" data-float="20" aria-hidden="true"></span>
@@ -1613,10 +1576,8 @@ function heroArt() {
       <circle cx="880" cy="300" r="210"/>
       <circle cx="880" cy="300" r="150" stroke-opacity=".12"/>
     </g>
-    <g transform="translate(880 300) scale(11) translate(-12 -12)"
-       fill="none" stroke="#D4AF37" stroke-opacity=".42" stroke-width=".8"
-       stroke-linecap="round" stroke-linejoin="round">
-      <use href="#i-veil" width="24" height="24"/>
+    <g fill="none" stroke="#D4AF37" stroke-opacity=".22">
+      <circle cx="880" cy="300" r="96"/><circle cx="880" cy="300" r="52" stroke-opacity=".14"/>
     </g>
     <g fill="#D4AF37" opacity=".55">
       <circle cx="240" cy="180" r="3"/><circle cx="1040" cy="620" r="2.5"/><circle cx="150" cy="520" r="2"/>
@@ -1877,9 +1838,6 @@ function heroIntro() {
     .from('[data-hero="3"] > *', { opacity: 0, y: 22, duration: .7, stagger: .1 }, '-=.55')
     .from('[data-hero="4"] > *', { opacity: 0, y: 16, duration: .7, stagger: .1 }, '-=.45')
     .from('.hero-ring', { scale: .82, opacity: 0, duration: 1.6, ease: 'power2.out' }, .1)
-    .from('.hero-card-a', { opacity: 0, y: 46, scale: .94, duration: 1.15 }, .3)
-    .from('.hero-card-b', { opacity: 0, y: 34, scale: .94, duration: 1 }, '-=.9')
-    .from('.hero-note', { opacity: 0, x: -22, duration: .8 }, '-=.7')
     .from('.scroll-cue', { opacity: 0, duration: .8 }, '-=.6');
 }
 
