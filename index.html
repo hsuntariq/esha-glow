@@ -182,8 +182,12 @@ h1,h2,h3,h4,.display{ font-family:'Playfair Display',serif; color:var(--ink); fo
 .arch-sm{ border-radius:150px 150px 16px 16px; overflow:hidden; }
 
 /* Image frames with graceful fallback */
-.frame{ position:relative; overflow:hidden; background:linear-gradient(135deg,var(--surface-2),var(--blush)); }
-.frame img,.frame > svg{ width:100%; height:100%; object-fit:cover; display:block; transition:transform 1.1s var(--ease), filter .6s ease; }
+.frame{
+  position:relative; overflow:hidden; display:block;
+  line-height:0; font-size:0;                       /* no inline-gap under the media */
+  background:linear-gradient(135deg,var(--surface-2),var(--blush));
+}
+.frame > svg{ width:100%; height:100%; display:block; transition:transform 1.1s var(--ease), filter .6s ease; }
 
 /* Inline icon system — no external icon font, so nothing can fail to load */
 .ic{
@@ -294,14 +298,18 @@ body.cursor-on.cursor-hot #dot{ transform:scale(3.4); background:transparent; bo
 /* ---------- Hero ---------- */
 #home{ position:relative; min-height:100svh; display:grid; align-items:center; overflow:hidden; }
 .hero-bg{ position:absolute; inset:-12% 0 -12% 0; z-index:0; }
-.hero-bg img,.hero-bg > svg{ width:100%; height:100%; object-fit:cover; display:block; }
+.hero-bg{ line-height:0; }
+.hero-bg > svg{ width:100%; height:100%; display:block; }
+.hero-bg > img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
 .art-slot{ width:100%; height:100%; }
 html.dark .frame > svg{ filter:brightness(.84) saturate(.92); }
 
 /* Photo layer. The SVG illustration stays underneath as the backdrop, so a
    photo that fails to load reveals a relevant illustration instead of a gap. */
-.frame > .photo{
-  position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:1;
+/* Every photo covers its frame edge to edge — cropped, never letterboxed. */
+.frame > img{
+  position:absolute; inset:0; width:100%; height:100%;
+  object-fit:cover; object-position:center; z-index:1; display:block;
   transition:transform 1.1s var(--ease), opacity .5s ease;
 }
 img[data-broken="1"]{ display:none; }
@@ -741,7 +749,7 @@ html.no-motion .reveal{ opacity:1; transform:none; }
 <!-- ============ HERO ============ -->
 <section id="home" aria-label="Welcome">
   <div class="hero-bg" data-parallax="0.22">
-    <div class="art-slot" data-art="hero" data-photo="beauty,salon" data-alt="The ESHA Glow studio floor"></div>
+    <div class="art-slot" data-art="hero" data-photo="beautysalon" data-alt="The ESHA Glow studio floor"></div>
   </div>
   <div class="hero-veil"></div>
   <div class="hero-grain"></div>
@@ -810,10 +818,10 @@ html.no-motion .reveal{ opacity:1; transform:none; }
   <div class="wrap grid lg:grid-cols-2 gap-14 lg:gap-20 items-center">
     <div class="relative reveal">
       <div class="frame arch shadow-[var(--shadow-lg)]" style="aspect-ratio:4/5">
-        <div class="art-slot" data-art="lipstick|makeup|The vanity" data-photo="makeup,artist" data-alt="Makeup artist working on a guest at the studio vanity"></div>
+        <div class="art-slot" data-art="lipstick|makeup|The vanity" data-photo="makeupartist" data-alt="Makeup artist working on a guest at the studio vanity"></div>
       </div>
       <div class="frame arch-sm absolute -bottom-8 -right-2 md:-right-10 w-40 md:w-56 shadow-[var(--shadow-lg)] hidden sm:block" style="aspect-ratio:3/4" data-parallax="-0.06">
-        <div class="art-slot" data-art="droplet|skin|Skin bar" data-photo="skincare,cosmetics" data-alt="Professional skincare products used in our facial rituals"></div>
+        <div class="art-slot" data-art="droplet|skin|Skin bar" data-ratio="600x800" data-photo="skincare" data-alt="Professional skincare products used in our facial rituals"></div>
       </div>
       <div class="absolute -top-5 -left-5 w-24 h-24 rounded-full border border-[var(--gold)] opacity-40 hidden md:block" aria-hidden="true"></div>
     </div>
@@ -888,10 +896,10 @@ html.no-motion .reveal{ opacity:1; transform:none; }
 
       <div class="grid grid-cols-2 gap-5">
         <div class="frame arch-sm shadow-[var(--shadow-md)] reveal" style="aspect-ratio:3/4">
-          <div class="art-slot" data-art="veil|bridal|Bridal suite" data-photo="bride,wedding" data-alt="Bride with finished hair and makeup"></div>
+          <div class="art-slot" data-art="veil|bridal|Bridal suite" data-ratio="600x800" data-photo="bride" data-alt="Bride with finished hair and makeup"></div>
         </div>
         <div class="frame rounded-2xl shadow-[var(--shadow-md)] mt-10 reveal" style="aspect-ratio:3/4">
-          <div class="art-slot" data-art="gem|bridal|Jewellery styling" data-photo="bridal,jewellery" data-alt="Bridal jewellery and detail styling"></div>
+          <div class="art-slot" data-art="gem|bridal|Jewellery styling" data-ratio="600x800" data-photo="jewellery" data-alt="Bridal jewellery and detail styling"></div>
         </div>
       </div>
     </div>
@@ -1440,46 +1448,46 @@ const escapeHTML = str => String(str).replace(/[&<>"']/g, c =>
    1. CONTENT DATA
    --------------------------------------------------------------- */
 const SERVICES = [
-  { name:'Hair Styling',      cat:'Hair',   motif:'comb',       tint:'hair', img:'hair,salon',   price:'Rs 2,500',  desc:'Blow-dry, curls or a set finish, shaped to your face and the event you are heading to.' },
-  { name:'Hair Color',        cat:'Hair',   motif:'palette',    tint:'color', img:'haircolor,hair',  price:'Rs 6,000',  desc:'Global colour, balayage and root touch-ups using ammonia-free professional lines.' },
-  { name:'Hair Spa',          cat:'Hair',   motif:'leaf',       tint:'spa', img:'hairspa,hair',    price:'Rs 3,200',  desc:'Deep-conditioning ritual with a scalp massage for dry, coloured or tired hair.' },
-  { name:'Facial',            cat:'Skin',   motif:'face-smile', tint:'skin', img:'facial,spa',   price:'Rs 3,000',  desc:'Classic cleanse, exfoliation and mask, prescribed after a skin reading.' },
-  { name:'Hydra Facial',      cat:'Skin',   motif:'droplet',    tint:'skin', img:'skincare,facial',   price:'Rs 8,500',  desc:'Medical-grade hydradermabrasion that clears congestion and leaves visible glow.' },
-  { name:'Skin Treatment',    cat:'Skin',   motif:'sparkles',   tint:'skin', img:'skincare,beauty',   price:'Rs 7,000',  desc:'Targeted courses for pigmentation, acne scarring and dullness.' },
-  { name:'Party Makeup',      cat:'Makeup', motif:'lipstick',   tint:'makeup', img:'makeup,beauty', price:'Rs 5,500',  desc:'Evening makeup with a soft-focus finish that photographs beautifully indoors.' },
-  { name:'Bridal Makeup',     cat:'Bridal', motif:'veil',       tint:'bridal', img:'bride,wedding', price:'Rs 35,000', desc:'Full bridal artistry with a trial, HD-safe products and all-day setting.' },
-  { name:'Mehndi',            cat:'Bridal', motif:'henna-hand', tint:'henna', img:'mehndi,henna',  price:'Rs 4,000',  desc:'Traditional and modern henna, hands to elbow or full bridal coverage.' },
-  { name:'Waxing',            cat:'Skin',   motif:'feather',    tint:'skin', img:'waxing,spa',   price:'Rs 1,800',  desc:'Warm and cold wax with soothing aftercare for sensitive skin.' },
-  { name:'Threading',         cat:'Skin',   motif:'brow',       tint:'skin', img:'eyebrows,beauty',   price:'Rs 500',    desc:'Brow mapping and shaping — the ten minutes that change the whole face.' },
-  { name:'Manicure',          cat:'Nails',  motif:'hand',       tint:'nails', img:'manicure,nails',  price:'Rs 2,200',  desc:'Cuticle work, shaping and a hand ritual finished with polish or gel.' },
-  { name:'Pedicure',          cat:'Nails',  motif:'foot',       tint:'nails', img:'pedicure,spa',  price:'Rs 2,800',  desc:'Soak, scrub and massage with heel repair for a properly restored finish.' },
-  { name:'Spa',               cat:'Spa',    motif:'lotus',      tint:'spa', img:'spa,massage',    price:'Rs 6,500',  desc:'Full-body relaxation with warm oils in the private treatment room.' },
-  { name:'Keratin Treatment', cat:'Hair',   motif:'bolt',       tint:'hair', img:'hair,straightening',   price:'Rs 12,000', desc:'Formaldehyde-free smoothing that lasts up to four months on most hair types.' },
-  { name:'Nail Art',          cat:'Nails',  motif:'polish',     tint:'nails', img:'nailart,nails',  price:'Rs 3,500',  desc:'Hand-painted detail, chrome, French and extensions by our nail artist.' }
+  { name:'Hair Styling',      cat:'Hair',   motif:'comb',       tint:'hair', img:'hairstyle',   price:'Rs 2,500',  desc:'Blow-dry, curls or a set finish, shaped to your face and the event you are heading to.' },
+  { name:'Hair Color',        cat:'Hair',   motif:'palette',    tint:'color', img:'haircolor',  price:'Rs 6,000',  desc:'Global colour, balayage and root touch-ups using ammonia-free professional lines.' },
+  { name:'Hair Spa',          cat:'Hair',   motif:'leaf',       tint:'spa', img:'haircare',    price:'Rs 3,200',  desc:'Deep-conditioning ritual with a scalp massage for dry, coloured or tired hair.' },
+  { name:'Facial',            cat:'Skin',   motif:'face-smile', tint:'skin', img:'facial',   price:'Rs 3,000',  desc:'Classic cleanse, exfoliation and mask, prescribed after a skin reading.' },
+  { name:'Hydra Facial',      cat:'Skin',   motif:'droplet',    tint:'skin', img:'skincare',   price:'Rs 8,500',  desc:'Medical-grade hydradermabrasion that clears congestion and leaves visible glow.' },
+  { name:'Skin Treatment',    cat:'Skin',   motif:'sparkles',   tint:'skin', img:'beautytreatment',   price:'Rs 7,000',  desc:'Targeted courses for pigmentation, acne scarring and dullness.' },
+  { name:'Party Makeup',      cat:'Makeup', motif:'lipstick',   tint:'makeup', img:'makeup', price:'Rs 5,500',  desc:'Evening makeup with a soft-focus finish that photographs beautifully indoors.' },
+  { name:'Bridal Makeup',     cat:'Bridal', motif:'veil',       tint:'bridal', img:'bridalmakeup', price:'Rs 35,000', desc:'Full bridal artistry with a trial, HD-safe products and all-day setting.' },
+  { name:'Mehndi',            cat:'Bridal', motif:'henna-hand', tint:'henna', img:'mehndi',  price:'Rs 4,000',  desc:'Traditional and modern henna, hands to elbow or full bridal coverage.' },
+  { name:'Waxing',            cat:'Skin',   motif:'feather',    tint:'skin', img:'waxing',   price:'Rs 1,800',  desc:'Warm and cold wax with soothing aftercare for sensitive skin.' },
+  { name:'Threading',         cat:'Skin',   motif:'brow',       tint:'skin', img:'eyebrows',   price:'Rs 500',    desc:'Brow mapping and shaping — the ten minutes that change the whole face.' },
+  { name:'Manicure',          cat:'Nails',  motif:'hand',       tint:'nails', img:'manicure',  price:'Rs 2,200',  desc:'Cuticle work, shaping and a hand ritual finished with polish or gel.' },
+  { name:'Pedicure',          cat:'Nails',  motif:'foot',       tint:'nails', img:'pedicure',  price:'Rs 2,800',  desc:'Soak, scrub and massage with heel repair for a properly restored finish.' },
+  { name:'Spa',               cat:'Spa',    motif:'lotus',      tint:'spa', img:'spa',    price:'Rs 6,500',  desc:'Full-body relaxation with warm oils in the private treatment room.' },
+  { name:'Keratin Treatment', cat:'Hair',   motif:'bolt',       tint:'hair', img:'hairsalon',   price:'Rs 12,000', desc:'Formaldehyde-free smoothing that lasts up to four months on most hair types.' },
+  { name:'Nail Art',          cat:'Nails',  motif:'polish',     tint:'nails', img:'nailart',  price:'Rs 3,500',  desc:'Hand-painted detail, chrome, French and extensions by our nail artist.' }
 ];
 
 const GALLERY = [
-  { cat:'bridal', motif:'veil',       tint:'bridal', img:'bride,wedding', label:'Barat day bridal' },
-  { cat:'hair',   motif:'comb',       tint:'hair', img:'hair,blowdry',   label:'Soft blow-dry set' },
-  { cat:'makeup', motif:'lipstick',   tint:'makeup', img:'makeup,glamour', label:'Evening glam' },
-  { cat:'nails',  motif:'polish',     tint:'nails', img:'nails,manicure',  label:'Almond gel set' },
-  { cat:'spa',    motif:'lotus',      tint:'spa', img:'spa,aromatherapy',    label:'Aromatherapy ritual' },
-  { cat:'hair',   motif:'palette',    tint:'color', img:'balayage,hair',  label:'Caramel balayage' },
-  { cat:'bridal', motif:'henna-hand', tint:'henna', img:'mehndi,henna',  label:'Mehndi night look' },
-  { cat:'makeup', motif:'wand',       tint:'makeup', img:'makeup,artist', label:'Studio makeup session' },
-  { cat:'spa',    motif:'droplet',    tint:'skin', img:'facial,skincare',   label:'Hydra facial finish' },
-  { cat:'nails',  motif:'hand',       tint:'nails', img:'nailart,nails',  label:'Chrome nail art' },
-  { cat:'hair',   motif:'bolt',       tint:'hair', img:'hair,keratin',   label:'Keratin smoothing' },
-  { cat:'bridal', motif:'gem',        tint:'bridal', img:'bridal,jewellery', label:'Bridal henna detail' }
+  { cat:'bridal', motif:'veil',       tint:'bridal', img:'bride', label:'Barat day bridal' },
+  { cat:'hair',   motif:'comb',       tint:'hair', img:'hairstyle',   label:'Soft blow-dry set' },
+  { cat:'makeup', motif:'lipstick',   tint:'makeup', img:'makeup', label:'Evening glam' },
+  { cat:'nails',  motif:'polish',     tint:'nails', img:'manicure',  label:'Almond gel set' },
+  { cat:'spa',    motif:'lotus',      tint:'spa', img:'spa',    label:'Aromatherapy ritual' },
+  { cat:'hair',   motif:'palette',    tint:'color', img:'balayage',  label:'Caramel balayage' },
+  { cat:'bridal', motif:'henna-hand', tint:'henna', img:'mehndi',  label:'Mehndi night look' },
+  { cat:'makeup', motif:'wand',       tint:'makeup', img:'makeupartist', label:'Studio makeup session' },
+  { cat:'spa',    motif:'droplet',    tint:'skin', img:'facial',   label:'Hydra facial finish' },
+  { cat:'nails',  motif:'hand',       tint:'nails', img:'nailart',  label:'Chrome nail art' },
+  { cat:'hair',   motif:'bolt',       tint:'hair', img:'hairsalon',   label:'Keratin smoothing' },
+  { cat:'bridal', motif:'gem',        tint:'bridal', img:'jewellery', label:'Bridal henna detail' }
 ];
 
 const REVIEWS = [
-  { name:'Ayesha Siddiqui', img:'woman,portrait', role:'Barat, March 2026',    text:'The trial six weeks out is what sold me. On the day there were no surprises, no last-minute panic, and my makeup survived fourteen hours and a lot of crying.' },
-  { name:'Mariam Tariq', img:'woman,portrait',    role:'Hair colour guest',    text:'I have been colouring my hair for twelve years and this is the first place that asked about my water and my routine before touching it. The balayage has grown out beautifully.' },
-  { name:'Zainab Ahmed', img:'woman,portrait',    role:'Premium member',       text:'The membership pays for itself by the third visit. Booking is easy, they remember what I had last time, and nobody tries to upsell me.' },
-  { name:'Hina Raza', img:'woman,portrait',       role:'Hydra facial course',  text:'Four sessions in and my pigmentation has genuinely faded. They were honest that it would take time instead of promising results after one appointment.' },
-  { name:'Sadia Malik', img:'woman,portrait',     role:'Nikkah, January 2026', text:'My mother and both sisters were done alongside me and every single look was different. That takes real skill and a team that actually talks to each other.' },
-  { name:'Fatima Noor', img:'woman,portrait',     role:'Spa & nails',          text:'The studio is quiet, which sounds like a small thing until you have spent years in salons with three televisions on. I leave calmer than I arrived.' }
+  { name:'Ayesha Siddiqui', img:'portrait', role:'Barat, March 2026',    text:'The trial six weeks out is what sold me. On the day there were no surprises, no last-minute panic, and my makeup survived fourteen hours and a lot of crying.' },
+  { name:'Mariam Tariq', img:'portrait',    role:'Hair colour guest',    text:'I have been colouring my hair for twelve years and this is the first place that asked about my water and my routine before touching it. The balayage has grown out beautifully.' },
+  { name:'Zainab Ahmed', img:'portrait',    role:'Premium member',       text:'The membership pays for itself by the third visit. Booking is easy, they remember what I had last time, and nobody tries to upsell me.' },
+  { name:'Hina Raza', img:'portrait',       role:'Hydra facial course',  text:'Four sessions in and my pigmentation has genuinely faded. They were honest that it would take time instead of promising results after one appointment.' },
+  { name:'Sadia Malik', img:'portrait',     role:'Nikkah, January 2026', text:'My mother and both sisters were done alongside me and every single look was different. That takes real skill and a team that actually talks to each other.' },
+  { name:'Fatima Noor', img:'portrait',     role:'Spa & nails',          text:'The studio is quiet, which sounds like a small thing until you have spent years in salons with three televisions on. I leave calmer than I arrived.' }
 ];
 
 /* ---------------------------------------------------------------
@@ -1588,7 +1596,8 @@ function fillArtSlots() {
   document.querySelectorAll('.art-slot').forEach(slot => {
     const spec = slot.dataset.art || '';
     const pic = slot.dataset.photo
-      ? photo(slot.dataset.photo, slot.dataset.alt || '', ...(spec === 'hero' ? [1600, 900] : [800, 1000]))
+      ? photo(slot.dataset.photo, slot.dataset.alt || '',
+              ...(spec === 'hero' ? [1600, 900] : (slot.dataset.ratio || '800x1000').split('x').map(Number)))
           .replace('loading="lazy"', spec === 'hero' ? 'fetchpriority="high"' : 'loading="lazy"')
       : '';
     slot.outerHTML = (spec === 'hero' ? heroArt() : art(...spec.split('|'))) + pic;
@@ -1627,7 +1636,7 @@ function renderGallery() {
   grid.innerHTML = GALLERY.map((g, i) => `
     <figure class="tile" data-cat="${g.cat}" data-index="${i}" tabindex="0" role="button"
             aria-label="Open ${escapeHTML(g.label)} in the viewer">
-      <div class="frame">${art(g.motif, g.tint, g.label)}${photo(g.img, g.label, 600, 760)}</div>
+      <div class="frame">${art(g.motif, g.tint, g.label)}${photo(g.img, g.label, 600, [800, 600, 750][i % 3])}</div>
       <figcaption class="tile-veil">
         <span>
           <em class="util block" style="color:var(--gold);font-style:normal">${escapeHTML(g.cat)}</em>
